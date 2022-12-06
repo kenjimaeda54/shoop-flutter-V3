@@ -22,6 +22,7 @@ class _FormProductState extends State<FormProduct> {
   final _formKey =
       GlobalKey<FormState>(); //isto sera adicionado ao campo formulario
   final _formData = <String, Object>{};
+  bool isLoading = false;
 
   //https://api.flutter.dev/flutter/widgets/State/didChangeDependencies.html
   @override
@@ -105,6 +106,7 @@ class _FormProductState extends State<FormProduct> {
   }
 
   void handleSubmitForm() {
+    setState(() => isLoading = true);
     final validator = _formKey.currentState?.validate() ?? false;
 
     if (!validator) {
@@ -132,9 +134,27 @@ class _FormProductState extends State<FormProduct> {
           description: _formData["description"] as String,
           price: double.parse(_formData["price"] as String),
           imageUrl: _formData["url"] as String);
-      provider.addProdct(productModel);
+      provider.addProdct(productModel, (status) {
+        if (status) {
+          Navigator.of(context).pop();
+          setState(() => isLoading = false);
+        } else {
+          setState(() => isLoading = false);
+          showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: const Text("Error"),
+                    content: const Text("Algo inesperado aconteceu"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text("Ok"),
+                      )
+                    ],
+                  ));
+        }
+      });
     }
-    Navigator.of(context).pop();
   }
 
   //text não posso desembrulhar usando != null
@@ -161,80 +181,85 @@ class _FormProductState extends State<FormProduct> {
           IconButton(onPressed: handleSubmitForm, icon: const Icon(Icons.save))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Form(
-          key: _formKey, //agora tenho acesso no metodo save
-          child: ListView(
-            children: [
-              TextFormField(
-                initialValue: _formData["name"]?.toString(),
-                decoration: const InputDecoration(label: Text("Nome")),
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (_) => handleFocus(_priceFoucs),
-                onSaved: (name) => handleSave(text: name, field: "name"),
-                validator: (name) =>
-                    handleValitorFieldString(text: name, quantity: 3),
-              ),
-              TextFormField(
-                initialValue: _formData["price"]?.toString(),
-                decoration: const InputDecoration(label: Text("Preço")),
-                textInputAction: TextInputAction.next,
-                focusNode: _priceFoucs,
-                onFieldSubmitted: (_) => handleFocus(_descriptionFocus),
-                onSaved: (price) =>
-                    handleSave(text: price, field: "price", isDouble: true),
-                validator: (price) => handleValidatorFieldDouble(price),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-              ),
-              TextFormField(
-                initialValue: _formData["description"]?.toString(),
-                decoration: const InputDecoration(label: Text("Descrição")),
-                focusNode: _descriptionFocus,
-                keyboardType: TextInputType.multiline,
-                onSaved: (description) =>
-                    handleSave(text: description, field: "description"),
-                validator: (description) =>
-                    handleValitorFieldString(text: description, quantity: 10),
-                maxLines: 3,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  //se não houver o expanded o elemento não ira aparecer,porque existe uma row em volta
-                  Expanded(
-                    child: TextFormField(
-                      decoration: const InputDecoration(label: Text("Url")),
-                      keyboardType: TextInputType.url,
-                      focusNode: _urlFocus,
-                      textInputAction: TextInputAction.done,
-                      controller: _urlController,
-                      onFieldSubmitted: (_) => handleSubmitForm(),
-                      onSaved: (url) => handleSave(text: url, field: "url"),
-                      validator: (url) => handleValidatorUrl(url),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(15),
+              child: Form(
+                key: _formKey, //agora tenho acesso no metodo save
+                child: ListView(
+                  children: [
+                    TextFormField(
+                      initialValue: _formData["name"]?.toString(),
+                      decoration: const InputDecoration(label: Text("Nome")),
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => handleFocus(_priceFoucs),
+                      onSaved: (name) => handleSave(text: name, field: "name"),
+                      validator: (name) =>
+                          handleValitorFieldString(text: name, quantity: 3),
                     ),
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    margin: const EdgeInsets.only(top: 10, left: 10),
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                      color: Colors.black45,
-                      width: 1,
-                    )),
-                    child: _urlController.text.isEmpty
-                        ? const Text("Imagem da url")
-                        : Image.network(_urlController.text),
-                  ),
-                ],
+                    TextFormField(
+                      initialValue: _formData["price"]?.toString(),
+                      decoration: const InputDecoration(label: Text("Preço")),
+                      textInputAction: TextInputAction.next,
+                      focusNode: _priceFoucs,
+                      onFieldSubmitted: (_) => handleFocus(_descriptionFocus),
+                      onSaved: (price) => handleSave(
+                          text: price, field: "price", isDouble: true),
+                      validator: (price) => handleValidatorFieldDouble(price),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                    ),
+                    TextFormField(
+                      initialValue: _formData["description"]?.toString(),
+                      decoration:
+                          const InputDecoration(label: Text("Descrição")),
+                      focusNode: _descriptionFocus,
+                      keyboardType: TextInputType.multiline,
+                      onSaved: (description) =>
+                          handleSave(text: description, field: "description"),
+                      validator: (description) => handleValitorFieldString(
+                          text: description, quantity: 10),
+                      maxLines: 3,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        //se não houver o expanded o elemento não ira aparecer,porque existe uma row em volta
+                        Expanded(
+                          child: TextFormField(
+                            decoration:
+                                const InputDecoration(label: Text("Url")),
+                            keyboardType: TextInputType.url,
+                            focusNode: _urlFocus,
+                            textInputAction: TextInputAction.done,
+                            controller: _urlController,
+                            onFieldSubmitted: (_) => handleSubmitForm(),
+                            onSaved: (url) =>
+                                handleSave(text: url, field: "url"),
+                            validator: (url) => handleValidatorUrl(url),
+                          ),
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.only(top: 10, left: 10),
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                            color: Colors.black45,
+                            width: 1,
+                          )),
+                          child: _urlController.text.isEmpty
+                              ? const Text("Imagem da url")
+                              : Image.network(_urlController.text),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
