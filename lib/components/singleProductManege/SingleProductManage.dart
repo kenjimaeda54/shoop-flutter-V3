@@ -12,22 +12,29 @@ class SingleProductManage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ProductListProvider productList = Provider.of(context);
+    final scafooldMensager = ScaffoldMessenger.of(context);
 
     void handleNavigation() {
       Navigator.of(context)
           .pushNamed(ConstantRoutes.formProduct, arguments: product);
     }
 
-    void handlePop(bool status) {
-      if (status) {
-        productList.removeProduct(product);
+    void handlePop(bool status) async {
+      try {
+        if (status) {
+          Navigator.of(context).pop();
+          await productList.removeProduct(product);
+          return;
+        }
         Navigator.of(context).pop();
-        return;
+      } catch (error) {
+        scafooldMensager.showSnackBar(SnackBar(
+            duration: const Duration(seconds: 2),
+            content: Text(error.toString())));
       }
-      Navigator.of(context).pop();
     }
 
-    void handleDelteProduct() {
+    void handleDeleteProduct() {
       showDialog(
           context: context,
           builder: (_) => AlertDialog(
@@ -65,7 +72,7 @@ class SingleProductManage extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.delete),
                 color: Theme.of(context).errorColor,
-                onPressed: handleDelteProduct,
+                onPressed: handleDeleteProduct,
               )
             ],
           ),

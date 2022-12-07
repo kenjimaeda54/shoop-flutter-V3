@@ -12,6 +12,11 @@ class ManageProduct extends StatelessWidget {
   Widget build(BuildContext context) {
     ProductListProvider products = Provider.of(context);
 
+    //métomodo onRefresh espera um Future
+    Future<void> handleRefreshProduct() {
+      return products.loadProdcutsOnFirebase();
+    }
+
     void handleNavigation() {
       Navigator.of(context).pushNamed(ConstantRoutes.formProduct);
     }
@@ -19,25 +24,23 @@ class ManageProduct extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Gerenciar produtos"),
-        backgroundColor: Theme
-            .of(context)
-            .primaryColor,
+        backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
         actions: [
-          IconButton(onPressed: handleNavigation, icon: const Icon(
-              Icons.add
-          ))
+          IconButton(onPressed: handleNavigation, icon: const Icon(Icons.add))
         ],
       ),
-      body: ListView.builder(
-        itemCount: products.shouldReturnTotalOfProducts,
-        itemBuilder: (ctx, index) =>
-            Column(
-              children: [
-                SingleProductManage(products.getItens()[index]),
-                const Divider()
-              ],
-            ),
+      body: RefreshIndicator(
+        onRefresh: handleRefreshProduct,
+        child: ListView.builder(
+          itemCount: products.shouldReturnTotalOfProducts,
+          itemBuilder: (ctx, index) => Column(
+            children: [
+              SingleProductManage(products.getItens()[index]),
+              const Divider()
+            ],
+          ),
+        ),
       ),
       drawer: const AppDrawer(),
     );

@@ -29,9 +29,9 @@ class _HomeState extends State<Home> {
     super.initState();
     //ddentro do init preciso chamar o listen  =false se não dara erro ,porque etamo no metodo StatefulWidget
     ProductListProvider providerList = Provider.of(context, listen: false);
-    providerList.loadProdcutsOnFirebase((_) {
-      setState(() => _isLoading = false);
-    });
+    providerList
+        .loadProdcutsOnFirebase()
+        .then((value) => {setState(() => _isLoading = false)});
   }
 
   void handlePopUpMenu(FavoritesOrNo value) {

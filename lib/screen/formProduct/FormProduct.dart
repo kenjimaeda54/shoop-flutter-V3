@@ -126,7 +126,10 @@ class _FormProductState extends State<FormProduct> {
           price: double.parse(_formData["price"] as String),
           imageUrl: _formData["url"] as String);
 
-      provider.updateProduct(productModel);
+      provider.updateProduct(productModel).then((value) {
+        Navigator.of(context).pop();
+        setState(() => isLoading = false);
+      });
     } else {
       final productModel = ProductModel(
           id: "${Random().nextDouble().toString()}-${_formData["name"]}-${_formData["url"]}",

@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shopp/httpException/CustomHttpException.dart';
 import 'package:shopp/utils/ConstantBaseUrl.dart';
 import '../data/products.dart';
 import '../models/ProductModel.dart';
@@ -18,7 +20,7 @@ import "package:http/http.dart" as http;
 //resumindo estou pegando as funicionalidades do ChangeNotificer e disponibilizando para nos
 class ProductListProvider with ChangeNotifier {
   final List<ProductModel> _products = [];
-  final _url = "${ConstantBaseUrl.baseUrl}/blablabal.json";
+  final _url = "${ConstantBaseUrl.baseUrl}/shoop";
 
   //se eu chamar apaenas products ao inves [...products]
   //esterei criando uma inferencia e minha lista original não ira atualizar
@@ -32,11 +34,11 @@ class ProductListProvider with ChangeNotifier {
   List<ProductModel> getItensFilter() =>
       mockShop.where((it) => it.isFavorite).toList();
 
-  void loadProdcutsOnFirebase(Function(bool status) completion) async {
+  Future<void> loadProdcutsOnFirebase() async {
     try {
       //toda vez que carregar a lista preciso garantir que esteja vazia
       _products.clear();
-      final responseFirebase = await http.get(Uri.parse(_url));
+      final responseFirebase = await http.get(Uri.parse("$_url.json"));
       final productsFirebase = jsonDecode(responseFirebase.body);
       if (productsFirebase != 'Null') {
         //no map o foreach retorna dois valores primeiro
@@ -53,11 +55,9 @@ class ProductListProvider with ChangeNotifier {
           ));
         });
         notifyListeners();
-        completion(true);
       }
     } catch (e) {
       print(e.toString());
-      completion(false);
     }
 
     // _products.add(jsonDecode(productsFirebase.body));
@@ -69,7 +69,7 @@ class ProductListProvider with ChangeNotifier {
       //estou usando real time
       //a partir do / e considerado uma coleção
       //.json essencial
-      Uri.parse(_url),
+      Uri.parse("$_url.json"),
       body: jsonEncode({
         "name": product.title,
         "imageUrl": product.imageUrl,
@@ -104,21 +104,46 @@ class ProductListProvider with ChangeNotifier {
         0;
   }
 
-  void updateProduct(ProductModel productModel) {
+  Future<void> updateProduct(ProductModel productModel) async {
     //se não achar retornara -1
     final hasIndex = _products.indexWhere((it) => it.id == productModel.id);
     if (hasIndex >= 0) {
+      await http.patch(
+        Uri.parse("$_url/${productModel.id}.json"),
+        body: jsonEncode({
+          "name": productModel.title,
+          "imageUrl": productModel.imageUrl,
+          "description": productModel.description,
+          "price": productModel.price,
+        }),
+      );
+
       _products[hasIndex] = productModel;
     }
     notifyListeners();
   }
 
-  void removeProduct(ProductModel productModel) {
+  Future<void> removeProduct(ProductModel productModel) async {
     //se não achar retornara -1
     final hasIndex = _products.indexWhere((it) => it.id == productModel.id);
     if (hasIndex >= 0) {
-      _products.removeWhere((it) => it.id == productModel.id);
+      final product = _products[hasIndex];
+      _products.remove(product);
+      notifyListeners();
+
+      final response =
+          await http.delete(Uri.parse("$_url/${productModel.id}.json"));
+
+      //erros 400 lado do cliente
+      //erros 500 lado do servidor
+      if (response.statusCode > 400) {
+        _products.insert(hasIndex, product);
+        notifyListeners();
+        //lancando meu proprio erro a partir da interface Exception
+        throw CustomHttpException(
+            message: "Não foi possivel deletar produto",
+            statusCode: response.statusCode);
+      }
     }
-    notifyListeners();
   }
 }
