@@ -11,25 +11,14 @@ class CartProduct extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CartProductProvider cartProvider = Provider.of(context);
-    OrderProvider order = Provider.of(context);
     //values e uma propriedade do Map,retorna os valores do map
     List<CartProductModel> cartModel =
-    cartProvider
-        .getAllProcut()
-        .values
-        .toList();
-
-    void handlePurchase() {
-      order.addOder(cartProvider);
-      cartProvider.clearList();
-    }
+        cartProvider.getAllProcut().values.toList();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Carrinho"),
-        backgroundColor: Theme
-            .of(context)
-            .primaryColor,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Column(children: [
         Card(
@@ -48,28 +37,18 @@ class CartProduct extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(
-                  width: 15,
-                ),
                 Chip(
                   label: Text(
-                    "R\$ ${cartProvider.shouldReturnTotalPrice.toStringAsFixed(
-                        2)}",
+                    "R\$ ${cartProvider.shouldReturnTotalPrice.toStringAsFixed(2)}",
                     style: const TextStyle(color: Colors.white),
                   ),
                   backgroundColor: Colors.purple,
                 ),
                 const Spacer(),
-                TextButton(
-                    onPressed: handlePurchase,
-                    child: const Text(
-                      "COMPRAR",
-                      style: TextStyle(
-                        color: Colors.purple,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ))
+                const ButtonShoop(),
+                const SizedBox(
+                  width: 15,
+                ),
               ],
             ),
           ),
@@ -81,5 +60,47 @@ class CartProduct extends StatelessWidget {
                     SingleCartProduct(cartModel[index])))
       ]),
     );
+  }
+}
+
+class ButtonShoop extends StatefulWidget {
+  const ButtonShoop({Key? key}) : super(key: key);
+
+  @override
+  State<ButtonShoop> createState() => _ButtonShoopState();
+}
+
+class _ButtonShoopState extends State<ButtonShoop> {
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    OrderProvider order = Provider.of(context);
+    CartProductProvider cartProvider = Provider.of(context);
+
+    void handlePurchase() async {
+      setState(() => isLoading = true);
+      await order.addOder(cartProvider).then((value) {
+        setState(() {
+          isLoading = false;
+          cartProvider.clearList();
+        });
+      });
+    }
+
+    return isLoading
+        ? const CircularProgressIndicator()
+        : cartProvider.getAllProcut().isEmpty
+            ? Container()
+            : TextButton(
+                onPressed: handlePurchase,
+                child: const Text(
+                  "COMPRAR",
+                  style: TextStyle(
+                    color: Colors.purple,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ));
   }
 }
