@@ -14,8 +14,9 @@ class ProductGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ProductListProvider stateProduct = Provider.of(context);
-    List<ProductModel> products =
-    showAllProducts ? stateProduct.getItens() : stateProduct.getItensFilter();
+    List<ProductModel> products = showAllProducts
+        ? stateProduct.getItens()
+        : stateProduct.getItensFilter();
 
     return GridView.builder(
         padding: const EdgeInsets.all(10),
@@ -32,8 +33,7 @@ class ProductGrid extends StatelessWidget {
 
         //uso o value,porque já existe um changeNotifierProvider fornecendo
         //uma coleção no main.dart
-        itemBuilder: (ctx, index) =>
-            ChangeNotifierProvider.value(
-                value: products[index], child: const SingleShop()));
+        itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+            value: products[index], child: SingleShop(showAllProducts)));
   }
 }

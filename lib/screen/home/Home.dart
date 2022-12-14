@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopp/components/badge/Badge.dart';
-import 'package:shopp/models/CartProductModel.dart';
 import "package:provider/provider.dart";
+import 'package:shopp/providers/AuthProvider.dart';
 import 'package:shopp/providers/CartProductProvider.dart';
 import 'package:shopp/providers/ProductListProvider.dart';
 import 'package:shopp/utils/ConstantsRoutes.dart';

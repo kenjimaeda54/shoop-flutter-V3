@@ -5,4 +5,6 @@ class ConstantRoutes {
   static const String oder = "order";
   static const String manageProduct = "manageProduct";
   static const String formProduct = "formProduct";
+  static const String auth = "auth";
+  static const String middleRoute = "middleRoute";
 }

@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:shopp/providers/AuthProvider.dart';
 import 'package:shopp/utils/ConstantsRoutes.dart';
 import 'package:provider/provider.dart';
 import '../../models/ProductModel.dart';
 import '../../providers/CartProductProvider.dart';
 
 class SingleShop extends StatelessWidget {
-  const SingleShop({super.key});
+  final bool isFavorite;
+
+  const SingleShop(this.isFavorite, {super.key});
 
   @override
   Widget build(BuildContext context) {
     //vou inibir qualquer mudança dessa lista usando false no listen
     final product = Provider.of<ProductModel>(context, listen: false);
     final cart = Provider.of<CartProductProvider>(context, listen: false);
+    AuthProvider auth = Provider.of(context);
 
     void handleNavigation() {
       Navigator.of(context)
@@ -49,12 +53,16 @@ class SingleShop extends StatelessWidget {
         //no ultimo parametro e para definir um filho que nunca sera mudado ou seja
         //estatico
         leading: Consumer<ProductModel>(
-          builder: (ctx, product, _) => IconButton(
-            onPressed: () => product.toogleIsFavorite(),
-            icon: Icon(
-                product.isFavorite ? Icons.favorite : Icons.favorite_border),
-            color: Theme.of(context).colorScheme.secondary,
-          ),
+          builder: (ctx, product, _) => isFavorite
+              ? IconButton(
+                  onPressed: () => product.toogleIsFavorite(
+                      auth.token ?? "", auth.uid ?? ""),
+                  icon: Icon(product.isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_border),
+                  color: Theme.of(context).colorScheme.secondary,
+                )
+              : Container(),
         ),
         trailing: IconButton(
           onPressed: () => handleAddProduct(product),

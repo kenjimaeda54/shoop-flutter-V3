@@ -6,7 +6,7 @@ import "package:http/http.dart" as http;
 import '../utils/ConstantBaseUrl.dart';
 
 class ProductModel with ChangeNotifier {
-  final _url = "${ConstantBaseUrl.baseUrl}/shoop";
+  final _url = "${ConstantBaseUrl.baseUrl}/favoritePerUses";
   late final String id;
   late final String title;
   late final String description;
@@ -23,13 +23,20 @@ class ProductModel with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  Future<void> toogleIsFavorite() async {
+  Future<void> toogleIsFavorite(String token, String uid) async {
     try {
       isFavorite = !isFavorite;
       notifyListeners();
+      //ao fazer put com id do usaruio ele ira criar um documento
+      //com id do usuario
+
+      //com flutter firebase trabalha em chave e valor
+      //estou pegando o id do produto e fazendo que ele se torne a chave
+      //por isso e so passado isFavorite e metodo e put
+      //put não posso inserir a chave sera o parametro passado na url
       await http
-          .patch(Uri.parse("$_url/$id.json"),
-          body: jsonEncode({"isFavorite": isFavorite}))
+          .put(Uri.parse("$_url/$uid/$id.json?auth=$token"),
+              body: jsonEncode(isFavorite))
           .catchError((error) => print(error));
     } catch (error) {
       print(error);
