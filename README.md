@@ -1,13 +1,13 @@
 #  Shoop
-Versao 3 do aplicativo de Loja. Nesta versao os dados foram salvos no firbase e tambem utlizamos o recurso de autenticacao
-
+Versão 3 do aplicativo da [Loja](https://github.com/kenjimaeda54/shoop-flutter-v1).</br>
+Nesta versão os dados foram salvos no firbase e também utilizamos o recurso de autenticação
 
 ## Feature
 - Para salvar os dados no firebase utilizamos o real time,ele disponibiliza uma api rest 
-- Para consumir api podemos usar o pacote [http](https://pub.dev/packages/http) 
-- Flutter em requisicoes trabalha com conceitos parecidos com Swift,quando desejamos receber um json suamos jsonDecode e se for enviar seria jsonEncode
+- Para consumir  api podemos usar o pacote [http](https://pub.dev/packages/http) 
+- Flutter em requisições trabalha com conceitos parecidos com Swift, quando desejamos receber um json usamos jsonDecode e se for enviar seria jsonEncode
 - Abaixo um exemplo de post,get e patch
-- Reapara qeu usamos chave e valor no jsonEncode ou seja ele trabalha com o coneito de map
+- Repara que usamos chave e valor no jsonEncode ou seja ele trabalha com o conceito de map
 
 
  ```dart 
@@ -26,6 +26,10 @@ Versao 3 do aplicativo de Loja. Nesta versao os dados foram salvos no firbase e 
  //get 
  final requestFavorite =
             await http.get(Uri.parse("$_urlFavorite/$userId.json?auth=$token"));
+            
+ final responseFavorite = requestFavorite.body != 'null'
+            ? jsonDecode(requestFavorite.body)
+            : {};            
 
  
  
@@ -104,14 +108,14 @@ class AuthException implements Exception {
 ```
 
 ## 
-- Para autenticacao usamos o conceito do token para verificar se o usuairo esta logado
-- Os tokens sao expireados apos determinado tempo
-- Abaixo uma logica para comparar o token
-- Com isAfter eu vejo se o tempo dentro da variavel esta no futuro se  nao estiver e que o tempo ja expirou
-- Essa variavel e instanciada  pegando a hora exta e adicionamos em segundos o tempo que ira expirar
-- Tericamente caso agora seja 9 horas e o tempo de expiracao 1 hora, entao essa variavel expira as 10 horas
+- Para autenticação usamos o conceito do token para verificar se o usuario esta logado
+- Os tokens são expirados apo determinado tempo
+- Abaixo uma lógica para comparar o token
+- Com isAfter eu vejo se o tempo dentro da variável está no futuro, se  não estiver e que o tempo já expirou
+- Essa variável e instanciada  pegando a hora exata e adicionamos em segundos o tempo que ira expirar
+- Teoricamente caso agora seja 9 horas e o tempo de expiração 1 hora, então essa variável expira às 10 horas
 - [ExpiresIn](https://firebase.google.com/docs/reference/rest/auth) e o segundos que o token ira expirar e fornecido pelo  firebase
-- Repaara qeu firebase trabalha com coneito de chave e valor no flutter
+- Repara que firebase trabalha com conceito de chave e valor no Flutter
 
 ``` dart
 
@@ -174,8 +178,8 @@ class AuthOrHome extends StatelessWidget {
 
 ```
 ## 
-- Para salvar os dados locammente usei o [Shared Preferences](https://pub.dev/packages/shared_preferences)
-- Usando essa abordagem e possivel o auto login  pois os dados ficam localmente
+- Para salvar os dados localmente usei o [Shared Preferences](https://pub.dev/packages/shared_preferences)
+- Usando essa abordagem e possível o auto login, pois os dados ficam localmente
 - E recomendado salvar poucos dados usando esta abordagem
 
 
