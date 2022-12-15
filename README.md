@@ -3,7 +3,7 @@ Versão 3 do aplicativo da [Loja](https://github.com/kenjimaeda54/shoop-flutter-
 Nesta versão os dados foram salvos no firbase e também utilizamos o recurso de autenticação
 
 ## Feature
-- Para salvar os dados no firebase utilizamos o real time,ele disponibiliza uma api rest 
+- Para salvar os dados no firebase utilizamos o real time,ele disponibiliza uma Api Rest 
 - Para consumir  api podemos usar o pacote [http](https://pub.dev/packages/http) 
 - Flutter em requisições trabalha com conceitos parecidos com Swift, quando desejamos receber um json usamos jsonDecode e se for enviar seria jsonEncode
 - Abaixo um exemplo de post,get e patch
