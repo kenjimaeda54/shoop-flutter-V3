@@ -7,7 +7,7 @@ Nesta versão os dados foram salvos no firbase e também utilizamos o recurso de
 - Para consumir  api podemos usar o pacote [http](https://pub.dev/packages/http) 
 - Flutter em requisições trabalha com conceitos parecidos com Swift, quando desejamos receber um json usamos jsonDecode e se for enviar seria jsonEncode
 - Abaixo um exemplo de post,get e patch
-- Repara que usamos chave e valor no jsonEncode ou seja ele trabalha com o conceito de map
+- Repara que usamos chave e valor no jsonEncode ou seja  trabalha com o conceito de map
 
 
  ```dart 
@@ -109,12 +109,12 @@ class AuthException implements Exception {
 
 ## 
 - Para autenticação usamos o conceito do token para verificar se o usuario esta logado
-- Os tokens são expirados apo determinado tempo
+- Os tokens são expirados apos determinado tempo
 - Abaixo uma lógica para comparar o token
-- Com isAfter eu vejo se o tempo dentro da variável está no futuro, se  não estiver e que o tempo já expirou
+- Com isAfter eu vejo se o tempo  da variável está no futuro, se  não estiver significa  expirou
 - Essa variável e instanciada  pegando a hora exata e adicionamos em segundos o tempo que ira expirar
 - Teoricamente caso agora seja 9 horas e o tempo de expiração 1 hora, então essa variável expira às 10 horas
-- [ExpiresIn](https://firebase.google.com/docs/reference/rest/auth) e o segundos que o token ira expirar e fornecido pelo  firebase
+- [ExpiresIn](https://firebase.google.com/docs/reference/rest/auth) e o segundos que o token ira expirar, fornecido pelo  firebase
 - Repara que firebase trabalha com conceito de chave e valor no Flutter
 
 ``` dart
@@ -133,8 +133,8 @@ class AuthException implements Exception {
 ```
 
 ##
-- Para garantir autenticacao de forma correta usmoas uma rota como middleware e futurametne ela foi usada tambem para implmeentar o auto login
-- Essa rota precisa ser registrada como a home da aplicacao no main.dart
+- Para garantir autenticação de forma correta usamos uma rota como middleware e futuramente ela foi usada também para implementar o auto login
+- Essa rota precisa ser registrada como a home da aplicação no main.dart
 
 
 ```dart
