@@ -1,5 +1,5 @@
 import 'dart:convert';
-import "package:shared_preferences/shared_preferences.dart";
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Store {
   static void saveString({required String key, required String value}) async {
@@ -21,14 +21,13 @@ class Store {
   static Future<Map<String, dynamic>> getMap(String key) async {
     try {
       return jsonDecode(await getString(key));
-    } catch (error) {
-      print(error);
+    } catch (_) {
       return {};
     }
   }
 
-  static Future<bool> remove(key) async {
+  static Future<void> removeStore(String key) async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.remove(key);
+    prefs.remove(key);
   }
 }

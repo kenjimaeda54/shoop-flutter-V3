@@ -31,10 +31,9 @@ class AuthProvider with ChangeNotifier {
     return isAuthenticated ? token : null;
   }
 
-  Future<void> autenticated(
-      {required String emailUser,
-      required String password,
-      required String urlFragment}) async {
+  Future<void> autenticated({required String emailUser,
+    required String password,
+    required String urlFragment}) async {
     final baseUrl =
         "https://identitytoolkit.googleapis.com/v1/accounts:$urlFragment?key=AIzaSyAqT06MJN44FzspoXwoJI8Yn3dOgZvuhOU";
 
@@ -57,34 +56,29 @@ class AuthProvider with ChangeNotifier {
       uid = responseDecode["localId"];
       token = responseDecode["idToken"];
       email = responseDecode["email"];
+
       Store.saveMap(key: ConstantStore.storeMap, value: {
+        "expires": expires?.toIso8601String(),
         "uid": uid,
         "token": token,
         "email": email,
-        "expires": expires?.toIso8601String(),
       });
-
       autoLogOut();
       notifyListeners();
     }
   }
 
   Future<void> tryAutoLogin() async {
-    try {
-      final userDefautls = await Store.getMap(ConstantStore.storeMap);
-      if (userDefautls.isEmpty) return;
-      final isOld = DateTime.parse(userDefautls["expires"]);
-      if (isOld.isBefore(DateTime.now())) {
-        return;
-      } //esta no passado expirou a data
+    final data = await Store.getMap(ConstantStore.storeMap);
+    if (data.isEmpty) return;
 
-      uid = userDefautls["uid"];
-      token = userDefautls["token"];
-      email = userDefautls["email"];
-      expires = isOld;
-    } catch (error) {
-      print(error);
-    }
+    final parseStoreExpires = DateTime.parse(data["expires"]);
+    if (parseStoreExpires.isBefore(DateTime.now())) return;
+
+    uid = data["uid"];
+    expires = parseStoreExpires;
+    email = data["email"];
+    token = data["token"];
   }
 
   Future<void> signUp({required String email, required String password}) async {
@@ -104,13 +98,15 @@ class AuthProvider with ChangeNotifier {
     email = null;
     expires = null;
     uid = null;
-    notifyListeners();
+    Store.removeStore(ConstantStore.storeMap).then((_) => notifyListeners());
   }
 
   //tentar resolver o timer
   void autoLogOut() {
     //duration vai retornar os segundos diferente entre o tempo forneceido e a data de agora
-    final duration = expires?.difference(DateTime.now()).inSeconds;
+    final duration = expires
+        ?.difference(DateTime.now())
+        .inSeconds;
     Timer.periodic(Duration(seconds: duration ?? 0), (timer) {
       timer.cancel();
       logOut();

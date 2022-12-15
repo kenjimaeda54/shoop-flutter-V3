@@ -10,20 +10,22 @@ class AuthOrHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AuthProvider auth = Provider.of(context);
-    // auth.isAuthenticated ? const Home() : const Auth();
     return Scaffold(
-      body: FutureBuilder(
-          future: auth.tryAutoLogin(),
-          builder: (ctx, status) {
-            if (status.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (status.hasError) {
-              return const Center(child: Text("Ops! algo deu errado"));
-            }
-            return auth.isAuthenticated ? const Home() : const Auth();
-          }),
-    );
+        body: FutureBuilder(
+      future: auth.tryAutoLogin(),
+      builder: (ctx, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text("Ops algo deu errado"),
+          );
+        }
+        return auth.isAuthenticated ? const Home() : const Auth();
+      },
+    ));
   }
 }
